@@ -273,6 +273,11 @@ export default function createInstantSearchManager({
     search();
   }
 
+  function refresh {
+    helper.clearCache();
+    search();
+  }
+
   function getWidgetsIds() {
     return store
       .getState()
