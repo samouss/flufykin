@@ -26,7 +26,7 @@ function validateNextProps(props, nextProps) {
  * @propType {string} appId - Your Algolia application id.
  * @propType {string} apiKey - Your Algolia search-only API key.Ç
  * @propType {string} indexName - Main index in which to search.
- * @propType {boolean} [refresh=true] - Flag to activate when the cache needs to be cleared so that whenever an update is made on the index, the front-end is updated.
+ * @propType {boolean} [refresh=true] - Flag to activate when the cache needs to be cleared so that the front-end is updated when there is an update on the index.
  * @propType {object} [algoliaClient] - Provide a custom Algolia client instead of the internal one.
  * @propType {func} [onSearchStateChange] - Function to be called everytime a new search is done. Useful for [URL Routing](guide/Routing.html).
  * @propType {object} [searchState] - Object to inject some search state. Switches the InstantSearch component in controlled mode. Useful for [URL Routing](guide/Routing.html).
@@ -72,7 +72,7 @@ class InstantSearch extends Component {
     }
 
     if (this.props.refresh !== nextProps.refresh) {
-      // do something
+      this.aisManager.refresh(nextProps.refresh);
     }
 
     if (this.props.algoliaClient !== nextProps.algoliaClient) {

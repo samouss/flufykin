@@ -61,6 +61,7 @@ export default function createInstantSearch(defaultAlgoliaClient, root) {
           onSearchParameters={this.props.onSearchParameters}
           root={root}
           algoliaClient={this.client}
+          refresh={this.props.refresh}
           resultsState={this.props.resultsState}
         >
           {this.props.children}

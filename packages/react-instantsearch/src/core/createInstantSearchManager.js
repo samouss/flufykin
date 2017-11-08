@@ -273,9 +273,11 @@ export default function createInstantSearchManager({
     search();
   }
 
-  function refresh {
-    helper.clearCache();
-    search();
+  function refresh(newRefresh) {
+    if (newRefresh) {
+      helper.clearCache();
+      search();
+    }
   }
 
   function getWidgetsIds() {
@@ -297,6 +299,7 @@ export default function createInstantSearchManager({
     onSearchForFacetValues,
     updateClient,
     updateIndex,
+    refresh,
     skipSearch,
   };
 }
