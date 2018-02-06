@@ -7,13 +7,19 @@ import { version } from '../../package.json';
  * Creates a specialized root InstantSearch component. It accepts
  * an algolia client and a specification of the root Element.
  * @param {function} defaultAlgoliaClient - a function that builds an Algolia client
+ * @param {function} defaultAlgoliaHelper - a function that builds an Algolia helper
  * @param {object} root - the defininition of the root of an InstantSearch sub tree.
  * @returns {object} an InstantSearch root
  */
-export default function createInstantSearch(defaultAlgoliaClient, root) {
+export default function createInstantSearch(
+  defaultAlgoliaClient,
+  defaultAlgoliaHelper,
+  root
+) {
   return class CreateInstantSearch extends Component {
     static propTypes = {
       algoliaClient: PropTypes.object,
+      algoliaHelper: PropTypes.object,
       appId: PropTypes.string,
       apiKey: PropTypes.string,
       children: PropTypes.oneOfType([
@@ -47,6 +53,10 @@ export default function createInstantSearch(defaultAlgoliaClient, root) {
         this.props.algoliaClient ||
         defaultAlgoliaClient(this.props.appId, this.props.apiKey);
 
+      this.helper =
+        this.props.algoliaHelper ||
+        defaultAlgoliaHelper(this.client, this.props.indexName);
+
       this.client.addAlgoliaAgent(`react-instantsearch ${version}`);
     }
 
@@ -75,6 +85,7 @@ export default function createInstantSearch(defaultAlgoliaClient, root) {
           root={this.props.root}
           algoliaClient={this.client}
           refresh={this.props.refresh}
+          algoliaHelper={this.helper}
           resultsState={this.props.resultsState}
         >
           {this.props.children}

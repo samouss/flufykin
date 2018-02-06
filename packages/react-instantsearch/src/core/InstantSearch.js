@@ -54,15 +54,15 @@ function validateNextProps(props, nextProps) {
 class InstantSearch extends Component {
   constructor(props) {
     super(props);
+
     this.isControlled = Boolean(props.searchState);
-    const initialState = this.isControlled ? props.searchState : {};
     this.isUnmounting = false;
 
     this.aisManager = createInstantSearchManager({
       indexName: props.indexName,
       searchParameters: props.searchParameters,
-      algoliaClient: props.algoliaClient,
-      initialState,
+      algoliaHelper: props.algoliaHelper,
+      initialState: this.isControlled ? props.searchState : {},
       resultsState: props.resultsState,
       stalledSearchDelay: props.stalledSearchDelay,
     });
@@ -180,6 +180,7 @@ InstantSearch.propTypes = {
   indexName: PropTypes.string.isRequired,
 
   algoliaClient: PropTypes.object.isRequired,
+  algoliaHelper: PropTypes.object.isRequired,
 
   searchParameters: PropTypes.object,
 

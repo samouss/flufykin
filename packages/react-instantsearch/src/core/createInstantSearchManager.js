@@ -1,5 +1,5 @@
-import { omit, isEmpty } from 'lodash';
-import algoliasearchHelper, { SearchParameters } from 'algoliasearch-helper';
+import { isEmpty, omit } from 'lodash';
+import { SearchParameters } from 'algoliasearch-helper';
 import createWidgetsManager from './createWidgetsManager';
 import createStore from './createStore';
 import highlightTags from './highlightTags.js';
@@ -15,13 +15,13 @@ import highlightTags from './highlightTags.js';
  */
 export default function createInstantSearchManager({
   indexName,
+  algoliaHelper,
   initialState = {},
-  algoliaClient,
   searchParameters = {},
   resultsState,
   stalledSearchDelay,
 }) {
-  const baseSP = new SearchParameters({
+  const defaultSearchParameters = new SearchParameters({
     ...searchParameters,
     index: indexName,
     ...highlightTags,
@@ -29,15 +29,16 @@ export default function createInstantSearchManager({
 
   let stalledSearchTimer = null;
 
-  const helper = algoliasearchHelper(algoliaClient, indexName, baseSP);
-  helper.on('result', handleSearchSuccess);
-  helper.on('error', handleSearchError);
-  helper.on('search', handleNewSearch);
+  algoliaHelper.setState(defaultSearchParameters);
+
+  algoliaHelper.on('search', handleNewSearch);
+  algoliaHelper.on('result', handleSearchSuccess);
+  algoliaHelper.on('error', handleSearchError);
 
   let derivedHelpers = {};
   let indexMapping = {}; // keep track of the original index where the parameters applied when sortBy is used.
 
-  let initialSearchParameters = helper.state;
+  let initialSearchParameters = algoliaHelper.state;
 
   const widgetsManager = createWidgetsManager(onWidgetsUpdate);
 
@@ -58,12 +59,12 @@ export default function createInstantSearchManager({
   }
 
   function updateClient(client) {
-    helper.setClient(client);
+    algoliaHelper.setClient(client);
     search();
   }
 
   function clearCache() {
-    helper.clearCache();
+    algoliaHelper.clearCache();
     search();
   }
 
@@ -137,15 +138,15 @@ export default function createInstantSearchManager({
         sharedParameters,
         mainIndexParameters,
         derivatedWidgets,
-      } = getSearchParameters(helper.state);
+      } = getSearchParameters(algoliaHelper.state);
       Object.keys(derivedHelpers).forEach(key => derivedHelpers[key].detach());
       derivedHelpers = {};
 
-      helper.setState(sharedParameters);
+      algoliaHelper.setState(sharedParameters);
 
       derivatedWidgets.forEach(derivatedSearchParameters => {
         const index = derivatedSearchParameters.targetedIndex;
-        const derivedHelper = helper.derive(() => {
+        const derivedHelper = algoliaHelper.derive(() => {
           const parameters = derivatedSearchParameters.widgets.reduce(
             (res, widget) => widget.getSearchParameters(res),
             sharedParameters
@@ -158,9 +159,9 @@ export default function createInstantSearchManager({
         derivedHelpers[index] = derivedHelper;
       });
 
-      helper.setState(mainIndexParameters);
+      algoliaHelper.setState(mainIndexParameters);
 
-      helper.search();
+      algoliaHelper.search();
     }
   }
 
@@ -180,7 +181,7 @@ export default function createInstantSearchManager({
 
     const currentState = store.getState();
     let nextIsSearchStalled = currentState.isSearchStalled;
-    if (!helper.hasPendingRequests()) {
+    if (!algoliaHelper.hasPendingRequests()) {
       clearTimeout(stalledSearchTimer);
       stalledSearchTimer = null;
       nextIsSearchStalled = false;
@@ -202,7 +203,7 @@ export default function createInstantSearchManager({
   function handleSearchError(error) {
     const currentState = store.getState();
     let nextIsSearchStalled = currentState.isSearchStalled;
-    if (!helper.hasPendingRequests()) {
+    if (!algoliaHelper.hasPendingRequests()) {
       clearTimeout(stalledSearchTimer);
       nextIsSearchStalled = false;
     }
@@ -279,7 +280,7 @@ export default function createInstantSearchManager({
       searchingForFacetValues: true,
     });
 
-    helper
+    algoliaHelper
       .searchForFacetValues(facetName, query, maxFacetHits)
       .then(
         content => {
