@@ -1,27 +1,12 @@
 {
   "name": "flufykin",
-  "version": "4.5.1",
-  "description": "⚡ Lightning-fast search for React and React Native apps, by Algolia",
-  "keywords": [
-    "algolia",
-    "components",
-    "fast",
-    "instantsearch",
-    "react",
-    "react-native",
-    "search"
-  ],
-  "homepage": "https://community.algolia.com/react-instantsearch",
+  "version": "4.5.2",
   "license": "MIT",
-  "author": {
-    "name": "Algolia, Inc.",
-    "url": "https://www.algolia.com"
-  },
   "main": "index.js",
   "module": "es/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/algolia/react-instantsearch"
+    "url": "https://github.com/samouss/react-instantsearch"
   },
   "scripts": {
     "build": "./scripts/build.sh",
