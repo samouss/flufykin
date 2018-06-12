@@ -29,7 +29,9 @@ export default function createInstantSearchManager({
 
   let stalledSearchTimer = null;
 
-  algoliaHelper.setState(defaultSearchParameters);
+  algoliaHelper.setState({
+    ...defaultSearchParameters,
+  });
 
   algoliaHelper.on('search', handleNewSearch);
   algoliaHelper.on('result', handleSearchSuccess);
